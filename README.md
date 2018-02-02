@@ -1,7 +1,10 @@
 # SceneSettings
 
-Save, load and compare scene parameters
-
+Save, load and compare scene parameters  
+  
+**[Download latest](https://github.com/Pullusb/SceneSettings/archive/master.zip)**  
+  
+---
 ### Description
 
 **Settings filepath/filebrowser**  
