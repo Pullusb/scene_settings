@@ -2,8 +2,8 @@ import bpy
 
 ###----PANNEL---
 
-class sceneSettingsPannel(bpy.types.Panel):
-    bl_label = "scene settings"
+class SST_PT_sceneSettingsPanel(bpy.types.Panel):
+    bl_label = "Scene Settings"
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
     bl_context = "scene"
@@ -11,14 +11,21 @@ class sceneSettingsPannel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         
-        row = layout.row(align=False)#layout.column()
+        row = layout.row(align=False)
         row.prop(bpy.context.scene, "settingsFilePath")
 
         row = layout.row()
         row.operator("settings.save")
-        row = layout.row() #comment this line to but save and load on same line
+        row = layout.row()
         row.operator("settings.load")
 
         row = layout.row()
         row.operator("settings.diff")
         row.split().prop(bpy.context.scene, "settingsStamp")
+
+
+def register():
+    bpy.utils.register_class(SST_PT_sceneSettingsPanel)
+
+def unregister():
+    bpy.utils.unregister_class(SST_PT_sceneSettingsPanel)

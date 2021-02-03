@@ -4,6 +4,8 @@ Save, load and compare scene parameters
   
 **[Download latest](https://github.com/Pullusb/SceneSettings/archive/master.zip)**  
   
+**[Latest 2.7 version](https://github.com/Pullusb/SceneSettings/releases/tag/v0.0.1)**
+
 ---
 ### Description
 
@@ -17,10 +19,18 @@ Print the parameters differences between saved json and current scene in the con
 **stamp changes**  
 If ticked, place the text of 'compare' in the *stamp output note* (usefull when you save a series of render while tweaking settings)
 
----
-
 ### where ?
 
 The panel is located in properties > scene
 
 ![scene Settings panel](https://github.com/Pullusb/images_repo/raw/master/blender_SceneSettings_panel.png)
+
+
+---
+
+### Changelog
+
+0.1.0:
+
+- update to 2.9
+- code cleanup
