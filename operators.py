@@ -79,8 +79,18 @@ def register():
     for cls in classes:
         register_class(cls)
 
-    bpy.types.Scene.settingsFilePath = bpy.props.StringProperty(name = "Settings", description = "location for the settings save/load\n", subtype='FILE_PATH')#, default = '%s/SceneSettings.json'%(bpy.path.abspath('//')))
-    bpy.types.Scene.settingsStamp = bpy.props.BoolProperty(name = "Stamp changes", description = "add differences between captured settings and current settings to Stamp note (usefull for comparing render)\n", default = False)
+    bpy.types.Scene.settingsFilePath = bpy.props.StringProperty(
+        name = "Settings", 
+        description = "location for the settings save/load\n", 
+        subtype='FILE_PATH') #, default = '%s/SceneSettings.json'%(bpy.path.abspath('//')))
+    bpy.types.Scene.settingsStamp = bpy.props.BoolProperty(
+        name = "Stamp changes", 
+        description = "add differences between captured settings and current settings to Stamp note (usefull for comparing render)\n",
+    default = False)
+    bpy.types.Scene.backup_lamps = bpy.props.BoolProperty(
+        name = "Backup Lamps", 
+        description = "Backup the lamps object of the scene",
+    default = False)
 
 def unregister():
     from bpy.utils import unregister_class

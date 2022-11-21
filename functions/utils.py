@@ -25,11 +25,23 @@ def compareMatrixList(one, two):
                 return (False)
     return (True)
 
+EXCLUDES = [
+    'name',
+    'bl_rna','identifier','name_property',
+    'rna_type','properties', 'stamp_note_text','use_stamp_note',
+    'settingsFilePath', 'settingsStamp', 'select',
+    'matrix_local', 'matrix_parent_inverse', 'matrix_basis', 
+    'location',
+    'rotation_euler', 'rotation_quaternion', 'rotation_axis_angle',
+    'scale']
+
 def saveAll(Root="bpy.context.scene"):
     '''iterate over given destination and return a dict containing every attribute'''
+
+    print(f'\n\n{Root}\n')
     Dic={}
     for attr in dir(eval(Root)):
-        if not attr.startswith('__')  and attr not in ['bl_rna','identifier','name_property','rna_type','properties', 'stamp_note_text','use_stamp_note', 'settingsFilePath', 'settingsStamp', 'select', 'matrix_local', 'matrix_parent_inverse', 'matrix_basis','location','rotation_euler', 'rotation_quaternion', 'rotation_axis_angle', 'scale']:
+        if not attr.startswith('__')  and attr not in EXCLUDES:
             try:
                 value = getattr(eval(Root),attr)
             except AttributeError:
@@ -37,6 +49,7 @@ def saveAll(Root="bpy.context.scene"):
             if value != None:
                 if not callable(value):
                     if type(value) in [type(0),type(0.0),type(True),type('str'),type(mathutils.Vector()),type(mathutils.Color()), type(mathutils.Matrix())]:
+                        print(attr)
                         Dic[attr] = convertAttr(value)
                     #else:
                     #    print(attr,value,type(value))

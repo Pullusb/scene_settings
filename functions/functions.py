@@ -6,18 +6,21 @@ def saveSettings(outFilePath):
     '''Save scene settings as json file at given file path'''
     settings = {}
     outfile = open(outFilePath, "w")
-    toSave = ['bpy.context.scene', 'bpy.context.scene.render','bpy.context.scene.cycles']
+    toSave = ['bpy.context.scene',
+                'bpy.context.scene.render',
+                'bpy.context.scene.cycles',
+                'bpy.context.scene.eevee']
     for zone in toSave:
         settings[zone] = saveAll(Root=zone)
 
-    for light in bpy.context.scene.objects:
-        if light.type == 'LAMP':
-            lightPath = "bpy.data.objects['{}']".format(light.name)
-            lightDataPath = "bpy.data.objects['{}'].data".format(light.name)
-            print("Dump:", lightPath)
-            settings[lightPath] = saveAll(lightPath)
-            settings[lightDataPath] = saveAll(lightDataPath)
-
+    if bpy.context.scene.backup_lamps:
+        for light in bpy.context.scene.objects:
+            if light.type == 'LAMP':
+                lightPath = "bpy.data.objects['{}']".format(light.name)
+                lightDataPath = "bpy.data.objects['{}'].data".format(light.name)
+                print("Dump:", lightPath)
+                settings[lightPath] = saveAll(lightPath)
+                settings[lightDataPath] = saveAll(lightDataPath)
 
     outfile.write(json.dumps(settings, indent='\t')) #sort_keys=True)
     outfile.close()
@@ -78,14 +81,14 @@ def compareSettings(outFilePath, stamping = False):
         print ("nothing changed")
         bpy.context.scene.render.stamp_note_text = ''
 
-
-def applySettings(outFilePath):
-    '''Get json filepath and apply every settings to current scene'''
-    outfile = open(outFilePath, "r")
-    loadedSettings = json.loads(outfile.read())
-    outfile.close()
-    for root, attrlist in loadedSettings.items():
+def apply_from_dict(data_dic, scene=None):        
+    for root, attrlist in data_dic.items():
+        ## FIXME quick fix to work on multi-scene
+        if scene is not None:
+            root = root.replace('bpy.context.scene', f"bpy.data.scenes['{scene.name}']")
+        print('root: ', root)
         for attr, value in attrlist.items():
+            print(f'apply {attr}, {value}')
             if type(value) == type(['list']) and len(value) == 4: # filter for world matrix
                 setattr(eval(root), attr, mathutils.Matrix(value))
             else:    
@@ -94,3 +97,10 @@ def applySettings(outFilePath):
                     # exec('%s.%s = value'%(root,attr))
                 except(AttributeError):
                     print("Unchanged(readOnly)>>", root, attr, value)
+
+def applySettings(outFilePath):
+    '''Get json filepath and apply every settings to current scene'''
+    outfile = open(outFilePath, "r")
+    loadedSettings = json.loads(outfile.read())
+    outfile.close()
+    apply_from_dict(loadedSettings)

@@ -18,10 +18,13 @@ class SST_PT_sceneSettingsPanel(bpy.types.Panel):
         row.operator("settings.save")
         row = layout.row()
         row.operator("settings.load")
+        row.operator("settings.apply_multi_scene")
 
         row = layout.row()
         row.operator("settings.diff")
         row.split().prop(bpy.context.scene, "settingsStamp")
+        row = layout.row()
+        row.prop(bpy.context.scene, "backup_lamps")
 
 
 def register():

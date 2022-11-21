@@ -30,7 +30,14 @@ The panel is located in properties > scene
 
 ### Changelog
 
-0.1.0:
+0.2.0
+
+- update for Blender 3+
+- added: New multi scene apply with select popup
+    - copy settings loaded file (same as existing `Load file`)
+    - copy settings from active scene to the others
+
+0.1.0
 
 - update to 2.9
 - code cleanup
