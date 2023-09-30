@@ -35,68 +35,80 @@ def compareMatrixList(one, two):
                 return (False)
     return (True)
 
-def compareSettings(outFilePath, stamping = False):
-    '''Get json filepath and print/stamp differences between captured state and current state return a diff dict'''
-    outfile = open(outFilePath, "r")
-    loadedSettings = json.loads(outfile.read())
-    outfile.close()
-    newState = saveAll()
+PROPNAME_EXCLUDE = ['name_full']
 
-    #put difference in a third dict
+def compareSettings(outFilePath, stamping = False):
+    '''Get json filepath
+    print/stamp differences between captured state and current state
+    Return a diff dict with data_path : (scene value, source value)'''
+
+    with open(outFilePath, "r") as fd:
+        loadedSettings = json.loads(fd.read())
+
     diff = {}
     
     for root, attrlist in loadedSettings.items():
         for attr, value in attrlist.items():
-            attrPath = '{}.{}'.format(root,attr)
+            if attr in PROPNAME_EXCLUDE:
+                continue
+            attrPath = '{}.{}'.format(root, attr)
             sceneValue = convertAttr(eval(attrPath))
 
             if sceneValue != value:
                 if type(eval(attrPath)) == type(mathutils.Matrix()):
                     if not compareMatrixList(sceneValue, value):
-                        diff[attrPath] = sceneValue
+                        diff[attrPath] = (sceneValue, value)
                 else:
-                    diff[attrPath] = sceneValue
+                    diff[attrPath] = (sceneValue, value)
 
-    # print number of properties changed
+    # Print number of properties changed
     if diff:
         print (len(diff), "properties changed:")
         
         stampstr = ''
-        for k, v in diff.items():
+        for k, values in diff.items():
+            v = values[0]
             print (k, ":", v)
             if stampstr:
-                stampstr += ' -- {} : {}'.format(k,v)
+                stampstr += f' -- {k} : {v}'
             else:
-                stampstr += 'TWEAK: {} : {}'.format(k,v)     
+                stampstr += f'TWEAK: {k} : {v}'
 
-        ##add pairs to stamping note
+        ## Add pairs to stamping note
         if stamping:
-            # print(stampstr)
-            bpy.context.scene.render.stamp_note_text = stampstr #str(diff) #add dict
+            bpy.context.scene.render.stamp_note_text = stampstr # str(diff) #add dict
 
-        return (diff)
+        return diff
     
-    ## erase note if nothing has changed
+    ## Erase note if nothing has changed
     else:
-        print ("nothing changed")
         bpy.context.scene.render.stamp_note_text = ''
+        print ("Nothing changed")
 
-def apply_from_dict(data_dic, scene=None):        
+
+def apply_from_dict(data_dic, scene=None, debug=False):
     for root, attrlist in data_dic.items():
         ## FIXME quick fix to work on multi-scene
         if scene is not None:
             root = root.replace('bpy.context.scene', f"bpy.data.scenes['{scene.name}']")
-        print('root: ', root)
+        print('\nroot: ', root)
         for attr, value in attrlist.items():
             print(f'apply {attr}, {value}')
-            if type(value) == type(['list']) and len(value) == 4: # filter for world matrix
-                setattr(eval(root), attr, mathutils.Matrix(value))
+            if type(value) == type(['list']) and len(value) == 4: # Filter for world matrix
+                try:
+                    setattr(eval(root), attr, mathutils.Matrix(value))
+                except Exception as e:
+                    print("Could not apply >>", root, attr, value)
+                    if debug:
+                        print(f'{e}\n')
             else:    
                 try:
                     setattr(eval(root), attr, value)
                     # exec('%s.%s = value'%(root,attr))
-                except(AttributeError):
-                    print("Unchanged(readOnly)>>", root, attr, value)
+                except Exception as e:
+                    print("Could not apply >>", root, attr, value)
+                    if debug:
+                        print(f'{e}\n')
 
 def applySettings(outFilePath):
     '''Get json filepath and apply every settings to current scene'''

@@ -1,6 +1,8 @@
 import bpy
 import os
 from .functions.functions import *
+from .preferences import get_addon_prefs
+
 
 class SST_OT_apply_multi_scene(bpy.types.Operator):
     bl_idname = "settings.apply_multi_scene"
@@ -83,8 +85,8 @@ class SST_OT_apply_multi_scene(bpy.types.Operator):
                 continue
             if item.select:
                 target_scene = bpy.data.scenes.get(item.s_name)
-                print('target_scene: ', target_scene)
-                apply_from_dict(settings, scene=target_scene)
+                print('Target Scene: ', target_scene)
+                apply_from_dict(settings, scene=target_scene, debug=get_addon_prefs().debug)
 
         return {"FINISHED"}
 

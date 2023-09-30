@@ -59,3 +59,34 @@ def saveAll(Root="bpy.context.scene"):
     ## scan loop over scene objects
 #    for i in bpy.context.scene.objects:
 #        print(json.dumps(saveAll(Root='bpy.context.scene.objects["%s"]'%i.name),indent='\t'))
+
+
+def show_message_box(_message = "", _title = "Message Box", _icon = 'INFO'):
+    '''Show message box with element passed as string or list
+    if _message if a list of lists:
+        if sublist have 2 element:
+            considered a label [text, icon]
+        if sublist have 3 element:
+            considered as an operator [ops_id_name, text, icon]
+        if sublist have 4 element:
+            considered as a property [object, propname, text, icon]
+    '''
+
+    def draw(self, context):
+        layout = self.layout
+        for l in _message:
+            if isinstance(l, str):
+                layout.label(text=l)
+            elif len(l) == 2: # label with icon
+                layout.label(text=l[0], icon=l[1])
+            elif len(l) == 3: # ops
+                layout.operator_context = "INVOKE_DEFAULT"
+                layout.operator(l[0], text=l[1], icon=l[2], emboss=False) # <- highligh the entry
+            elif len(l) == 4: # prop
+                row = layout.row(align=True)
+                row.label(text=l[2], icon=l[3])
+                row.prop(l[0], l[1], text='') 
+    
+    if isinstance(_message, str):
+        _message = [_message]
+    bpy.context.window_manager.popup_menu(draw, title = _title, icon = _icon)

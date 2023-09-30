@@ -30,6 +30,11 @@ The panel is located in properties > scene
 
 ### Changelog
 
+0.3.0
+
+- added: selective laod properties with compare button
+- fixed: possible errors when setting properties
+
 0.2.0
 
 - update for Blender 3+
